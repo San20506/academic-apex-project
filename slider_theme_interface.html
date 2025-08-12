@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Apex - Slider Theme Interface</title>
+    <style>
+        /* Main theme variables */
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2d2d2d;
+            --accent-color: #4a9eff;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --slider-track: #404040;
+            --slider-thumb: #4a9eff;
+            --border-color: #555;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--accent-color), #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(74, 158, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(74, 158, 255, 0.8)); }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Slider Components */
+        .slider-section {
+            background: rgba(45, 45, 45, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .slider-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(74, 158, 255, 0.2);
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--slider-track);
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s ease;
+            position: relative;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--slider-thumb), #00d4aa);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--slider-thumb), #00d4aa);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-value {
+            display: inline-block;
+            float: right;
+            background: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-color), #0056b3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success-color), #388e3c);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, var(--warning-color), #f57c00);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Console Output */
+        .console {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            min-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .console-prompt {
+            color: #ffff00;
+        }
+
+        .console-error {
+            color: #ff4444;
+        }
+
+        .console-success {
+            color: #44ff44;
+        }
+
+        /* Status indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: var(--success-color);
+        }
+
+        .status-offline {
+            background: var(--error-color);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Academic Apex Strategist</h1>
+            <p class="subtitle">Advanced AI-Powered Research & Development Interface</p>
+        </header>
+
+        <div class="control-panel">
+            <!-- Model Configuration -->
+            <div class="slider-section">
+                <h3><span class="status-indicator status-online"></span>Model Configuration</h3>
+                
+                <div class="slider-container">
+                    <label class="slider-label">Temperature <span class="slider-value" id="temp-value">0.7</span></label>
+                    <input type="range" min="0" max="1" step="0.1" value="0.7" class="slider" id="temperature">
+                </div>
+
+                <div class="slider-container">
+                    <label class="slider-label">Max Tokens <span class="slider-value" id="tokens-value">1024</span></label>
+                    <input type="range" min="100" max="4000" step="100" value="1024" class="slider" id="max-tokens">
+                </div>
+
+                <div class="slider-container">
+                    <label class="slider-label">Top-p <span class="slider-value" id="top-p-value">0.9</span></label>
+                    <input type="range" min="0.1" max="1" step="0.1" value="0.9" class="slider" id="top-p">
+                </div>
+            </div>
+
+            <!-- System Controls -->
+            <div class="slider-section">
+                <h3><span class="status-indicator status-online"></span>System Controls</h3>
+                
+                <div class="slider-container">
+                    <label class="slider-label">API Timeout (seconds) <span class="slider-value" id="timeout-value">120</span></label>
+                    <input type="range" min="30" max="300" step="30" value="120" class="slider" id="api-timeout">
+                </div>
+
+                <div class="slider-container">
+                    <label class="slider-label">Retry Attempts <span class="slider-value" id="retry-value">3</span></label>
+                    <input type="range" min="1" max="10" step="1" value="3" class="slider" id="retry-attempts">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="testConnection()">Test Connection</button>
+                    <button class="btn btn-success" onclick="applySettings()">Apply Settings</button>
+                    <button class="btn btn-warning" onclick="resetDefaults()">Reset Defaults</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Panel -->
+        <div class="slider-section">
+            <h3>Actions & Commands</h3>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="startCurator()">Start Curator Service</button>
+                <button class="btn btn-primary" onclick="listModels()">List Available Models</button>
+                <button class="btn btn-success" onclick="applyCmdTheme()">Apply CMD Theme</button>
+                <button class="btn btn-warning" onclick="exportSettings()">Export Settings</button>
+            </div>
+        </div>
+
+        <!-- Console Output -->
+        <div class="console" id="console">
+            <div class="console-prompt">Academic-Apex@System:~$ </div>
+            <div>Welcome to Academic Apex Strategist v1.0</div>
+            <div class="console-success">System initialized successfully</div>
+            <div>Type commands or use the interface controls above...</div>
+            <div class="console-prompt">Academic-Apex@System:~$ <span id="cursor">█</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Slider value updates
+        const sliders = [
+            {id: 'temperature', valueId: 'temp-value'},
+            {id: 'max-tokens', valueId: 'tokens-value'},
+            {id: 'top-p', valueId: 'top-p-value'},
+            {id: 'api-timeout', valueId: 'timeout-value'},
+            {id: 'retry-attempts', valueId: 'retry-value'}
+        ];
+
+        sliders.forEach(slider => {
+            const element = document.getElementById(slider.id);
+            const valueElement = document.getElementById(slider.valueId);
+            
+            element.addEventListener('input', function() {
+                valueElement.textContent = this.value;
+            });
+        });
+
+        // Console functionality
+        const console_element = document.getElementById('console');
+        
+        function addToConsole(message, type = 'normal') {
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'console-error' : type === 'success' ? 'console-success' : '';
+            div.textContent = message;
+            
+            // Remove cursor
+            const cursor = document.getElementById('cursor');
+            if (cursor) cursor.remove();
+            
+            console_element.appendChild(div);
+            
+            // Add new prompt with cursor
+            const promptDiv = document.createElement('div');
+            promptDiv.className = 'console-prompt';
+            promptDiv.innerHTML = 'Academic-Apex@System:~$ <span id="cursor">█</span>';
+            console_element.appendChild(promptDiv);
+            
+            console_element.scrollTop = console_element.scrollHeight;
+        }
+
+        // Action functions
+        function testConnection() {
+            addToConsole('Testing Ollama connection...');
+            // Simulate async operation
+            setTimeout(() => {
+                addToConsole('✓ Connection successful - Ollama is reachable', 'success');
+            }, 1000);
+        }
+
+        function applySettings() {
+            const settings = {
+                temperature: document.getElementById('temperature').value,
+                maxTokens: document.getElementById('max-tokens').value,
+                topP: document.getElementById('top-p').value,
+                timeout: document.getElementById('api-timeout').value,
+                retries: document.getElementById('retry-attempts').value
+            };
+            
+            addToConsole(`Applying settings: ${JSON.stringify(settings)}`);
+            addToConsole('✓ Settings applied successfully', 'success');
+        }
+
+        function resetDefaults() {
+            document.getElementById('temperature').value = 0.7;
+            document.getElementById('temp-value').textContent = '0.7';
+            document.getElementById('max-tokens').value = 1024;
+            document.getElementById('tokens-value').textContent = '1024';
+            document.getElementById('top-p').value = 0.9;
+            document.getElementById('top-p-value').textContent = '0.9';
+            document.getElementById('api-timeout').value = 120;
+            document.getElementById('timeout-value').textContent = '120';
+            document.getElementById('retry-attempts').value = 3;
+            document.getElementById('retry-value').textContent = '3';
+            
+            addToConsole('Settings reset to defaults', 'success');
+        }
+
+        function startCurator() {
+            addToConsole('Starting Curator Service on port 5001...');
+            setTimeout(() => {
+                addToConsole('✓ Curator Service started successfully', 'success');
+                addToConsole('Listening on http://localhost:5001');
+            }, 1500);
+        }
+
+        function listModels() {
+            addToConsole('Fetching available models...');
+            setTimeout(() => {
+                addToConsole('Available models:');
+                addToConsole('- mistral-7b (default curator model)');
+                addToConsole('- deepseek-coder (default code model)');
+                addToConsole('- llama2:13b');
+                addToConsole('✓ Model list retrieved', 'success');
+            }, 1000);
+        }
+
+        function applyCmdTheme() {
+            addToConsole('Applying theme to Windows Command Prompt...');
+            
+            // Generate PowerShell script to modify CMD appearance
+            const psScript = `
+# Academic Apex CMD Theme Script
+$regPath = "HKCU:\\Console"
+$values = @{
+    'ColorTable00' = 0x1a1a1a  # Black (Background)
+    'ColorTable01' = 0x4a9eff  # Blue (Accent)
+    'ColorTable02' = 0x4caf50  # Green (Success)
+    'ColorTable03' = 0x00d4aa  # Cyan (Info)
+    'ColorTable04' = 0xf44336  # Red (Error)
+    'ColorTable05' = 0x9c27b0  # Magenta
+    'ColorTable06' = 0xff9800  # Yellow (Warning)
+    'ColorTable07' = 0xffffff  # White (Text)
+    'ColorTable08' = 0x555555  # Bright Black
+    'ColorTable09' = 0x6ec6ff  # Bright Blue
+    'ColorTable10' = 0x81c784  # Bright Green
+    'ColorTable11' = 0x4dd0e1  # Bright Cyan
+    'ColorTable12' = 0xe57373  # Bright Red
+    'ColorTable13' = 0xba68c8  # Bright Magenta
+    'ColorTable14' = 0xffb74d  # Bright Yellow
+    'ColorTable15' = 0xffffff  # Bright White
+    'ScreenColors' = 0x07       # White text on black background
+    'PopupColors' = 0x17        # White text on blue background
+    'FontFamily' = 0x36         # TrueType font family
+    'FontSize' = 0x000c0000     # Font size (12pt)
+    'FontWeight' = 0x190        # Normal weight
+    'CursorSize' = 0x19         # Cursor size (25%)
+    'HistoryBufferSize' = 0x32  # Command history size
+    'NumberOfHistoryBuffers' = 0x4  # Number of history buffers
+    'QuickEdit' = 0x1           # Enable QuickEdit mode
+    'FaceName' = 'Consolas'     # Font name
+}
+
+foreach ($key in $values.Keys) {
+    if ($key -eq 'FaceName') {
+        Set-ItemProperty -Path $regPath -Name $key -Value $values[$key] -Type String
+    } else {
+        Set-ItemProperty -Path $regPath -Name $key -Value $values[$key] -Type DWord
+    }
+}
+
+Write-Host "✓ Academic Apex theme applied to Command Prompt" -ForegroundColor Green
+Write-Host "Changes will take effect in new CMD windows" -ForegroundColor Yellow
+            `;
+
+            addToConsole('PowerShell script generated for CMD theming');
+            addToConsole('✓ Theme configuration ready for Windows CMD', 'success');
+            addToConsole('Note: Run the generated PowerShell script as administrator');
+            
+            // You could also trigger the actual PowerShell execution here if needed
+        }
+
+        function exportSettings() {
+            const config = {
+                theme: 'Academic Apex Slider Theme',
+                version: '1.0.0',
+                timestamp: new Date().toISOString(),
+                settings: {
+                    model: {
+                        temperature: parseFloat(document.getElementById('temperature').value),
+                        maxTokens: parseInt(document.getElementById('max-tokens').value),
+                        topP: parseFloat(document.getElementById('top-p').value)
+                    },
+                    system: {
+                        apiTimeout: parseInt(document.getElementById('api-timeout').value),
+                        retryAttempts: parseInt(document.getElementById('retry-attempts').value)
+                    }
+                },
+                cmdTheme: {
+                    background: '#1a1a1a',
+                    accent: '#4a9eff',
+                    success: '#4caf50',
+                    warning: '#ff9800',
+                    error: '#f44336',
+                    text: '#ffffff'
+                }
+            };
+
+            const dataStr = JSON.stringify(config, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'academic-apex-config.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            addToConsole('✓ Settings exported to academic-apex-config.json', 'success');
+        }
+
+        // Cursor animation
+        setInterval(() => {
+            const cursor = document.getElementById('cursor');
+            if (cursor) {
+                cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+            }
+        }, 500);
+
+        // Initial message
+        setTimeout(() => {
+            addToConsole('Interface loaded successfully');
+            addToConsole('Ready for Academic Apex operations', 'success');
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+FROM python:3.11-slim
+
+LABEL maintainer="Academic Apex Project"
+LABEL description="Academic Apex Strategist - Curator Service"
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy curator requirements
+COPY curator-requirements.txt requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy curator service code
+COPY curator_service.py .
+COPY ollama_adapter.py .
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV CURATOR_MODEL=mistral:7b
+ENV OLLAMA_HOST=http://host.docker.internal:11434
+
+# Expose port
+EXPOSE 5001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:5001/healthz || exit 1
+
+# Run the curator service
+CMD ["python", "curator_service.py"]

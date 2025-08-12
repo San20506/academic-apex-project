@@ -1,0 +1,16 @@
+# FastAPI and ASGI server
+fastapi
+uvicorn[standard]
+
+# HTTP client and async support
+httpx
+requests
+
+# Data validation and serialization
+pydantic
+pydantic-settings
+
+# Utilities
+python-multipart
+python-dotenv
+typing-extensions

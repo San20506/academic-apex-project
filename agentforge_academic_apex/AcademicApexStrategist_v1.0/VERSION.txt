@@ -1,0 +1,8 @@
+Academic Apex Strategist v1.0 
+Build Date: 12-08-2025 18:40:25.35 
+ 
+Self-contained Windows executable 
+No Python installation required 
+ 
+File size: 
+  Executable: 13209582 bytes 
