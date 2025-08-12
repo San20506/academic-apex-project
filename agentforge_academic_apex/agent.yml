@@ -1,0 +1,243 @@
+name: "Academic Apex Strategist"
+version: "1.0.0"
+description: "AI-powered academic assistant for creating study plans, quizzes, and learning materials using local Ollama models"
+
+# Agent Configuration
+agent:
+  type: "academic-assistant"
+  capabilities:
+    - "diagnostic_quiz_generation"
+    - "study_plan_creation"  
+    - "code_module_generation"
+    - "obsidian_vault_integration"
+    - "prompt_curation"
+  
+  # Local LLM Configuration
+  llm:
+    provider: "ollama"
+    base_url: "http://localhost:11434"
+    primary_model: "deepseek-coder"
+    fallback_models:
+      - "mistral-7b"
+      - "codellama"
+    
+    generation_config:
+      max_tokens: 2048
+      temperature: 0.7
+      top_p: 0.9
+      
+  # Prompt Curation Middleware
+  curation:
+    enabled: true
+    endpoint: "http://localhost:5001/api/curate"
+    model: "mistral-7b"
+    fallback_enabled: true
+    
+# Task Definitions
+tasks:
+  
+  diagnostic_quiz:
+    name: "Generate Diagnostic Quiz"
+    description: "Create a comprehensive diagnostic quiz for a given subject"
+    input_schema:
+      subject: 
+        type: "string"
+        required: true
+        description: "Subject or topic for the quiz"
+      difficulty:
+        type: "string" 
+        default: "intermediate"
+        options: ["beginner", "intermediate", "advanced"]
+      num_questions:
+        type: "integer"
+        default: 10
+        min: 5
+        max: 50
+    
+    prompts:
+      system: |
+        You are an expert academic quiz creator. Generate comprehensive diagnostic quizzes that accurately assess student knowledge levels.
+        
+        Requirements:
+        - Create exactly {num_questions} questions at {difficulty} level
+        - Include multiple choice, short answer, and essay questions
+        - Provide detailed answer explanations
+        - Format with clear section headers
+        - End with "---ANSWERS---" section containing all answers
+        
+      user: |
+        Create a {difficulty} level diagnostic quiz for {subject} with {num_questions} questions.
+        
+        Include a mix of question types to thoroughly assess understanding of core concepts, practical applications, and critical thinking skills.
+        
+        Format the quiz professionally with clear instructions and answer key.
+
+  create_study_plan:
+    name: "Create Study Plan"
+    description: "Generate a detailed minute-by-minute study plan"
+    input_schema:
+      subject:
+        type: "string" 
+        required: true
+        description: "Subject or topic for study plan"
+      duration:
+        type: "string"
+        default: "2 hours"
+        description: "Total study time (e.g., '2 hours', '90 minutes')"
+      learning_objectives:
+        type: "array"
+        default: []
+        description: "Specific learning objectives to cover"
+      student_level:
+        type: "string"
+        default: "intermediate" 
+        options: ["beginner", "intermediate", "advanced"]
+        
+    prompts:
+      system: |
+        You are an expert learning strategist. Create detailed, minute-by-minute study plans that optimize learning efficiency and retention.
+        
+        Requirements:
+        - Break down the full {duration} into specific time blocks
+        - Include variety: reading, practice, review, breaks
+        - Specify exact timing (e.g., "0:00-0:15 - Topic Introduction")
+        - Include active learning techniques
+        - Add progress checkpoints and self-assessment moments
+        - Format as clear markdown with timeline structure
+        
+      user: |
+        Create a comprehensive {duration} study plan for {subject} at {student_level} level.
+        
+        Learning objectives: {learning_objectives}
+        
+        The plan should be structured as a minute-by-minute timeline that maximizes learning effectiveness through varied activities and strategic breaks.
+
+  generate_code_module:
+    name: "Generate Code Module"
+    description: "Create a Python module with utility functions for academic tasks"
+    input_schema:
+      module_name:
+        type: "string"
+        default: "study_utils"
+        description: "Name for the Python module"
+      functionality:
+        type: "string"
+        required: true
+        description: "Description of desired functionality"
+      include_tests:
+        type: "boolean"
+        default: true
+        description: "Whether to include unit tests"
+        
+    prompts:
+      system: |
+        You are an expert Python developer specializing in educational tools. Create clean, well-documented Python modules with comprehensive functionality.
+        
+        Requirements:
+        - Write complete, runnable Python code
+        - Include comprehensive docstrings
+        - Follow PEP 8 style guidelines
+        - Add type hints where appropriate
+        - Include error handling
+        - Create unit tests if requested
+        - Focus on educational/academic utility functions
+        
+      user: |
+        Create a Python module named '{module_name}' that provides {functionality}.
+        
+        Include tests: {include_tests}
+        
+        The module should be production-ready with proper documentation and error handling.
+
+# Integration Settings
+integrations:
+  
+  obsidian:
+    description: "Obsidian vault integration for note management"
+    required_env_vars:
+      - "OBSIDIAN_VAULT_PATH"
+    vault_structure:
+      root_folder: "AcademicApex"
+      subfolders:
+        - "StudyPlans"
+        - "Quizzes" 
+        - "CodeModules"
+    note_format: "markdown_with_frontmatter"
+    
+  ollama:
+    description: "Local Ollama service for LLM inference"
+    health_check_url: "http://localhost:11434/api/tags"
+    required_models:
+      - "deepseek-coder"
+      - "mistral-7b"
+    retry_config:
+      max_retries: 3
+      backoff_factor: 2
+      
+  curator_service:
+    description: "Local prompt curation service"
+    health_check_url: "http://localhost:5001/healthz"
+    endpoints:
+      curate: "/api/curate"
+      health: "/healthz"
+
+# Environment Configuration
+environment:
+  required_vars:
+    - name: "OBSIDIAN_VAULT_PATH"
+      description: "Path to Obsidian vault directory"
+      example: "/path/to/your/obsidian/vault"
+      
+  optional_vars:
+    - name: "OLLAMA_HOST"  
+      description: "Ollama API base URL"
+      default: "http://localhost:11434"
+      
+    - name: "CURATOR_MODEL"
+      description: "Model name for prompt curation"
+      default: "mistral-7b"
+      
+    - name: "CURATOR_SERVICE_URL"
+      description: "Curator service base URL"
+      default: "http://localhost:5001"
+
+# Operational Settings
+operations:
+  startup_checks:
+    - "ollama_connectivity"
+    - "model_availability" 
+    - "vault_accessibility"
+    - "curator_service_health"
+    
+  error_handling:
+    log_level: "INFO"
+    log_file: "logs/academic_apex.log"
+    fallback_mode: true
+    
+  output_formats:
+    quiz: "obsidian_markdown"
+    study_plan: "obsidian_markdown"
+    code_module: "python_file"
+    
+# Metadata
+metadata:
+  author: "Academic Apex Project"
+  license: "MIT"
+  repository: "https://github.com/example/academic-apex"
+  created: "2025-01-12"
+  last_updated: "2025-01-12"
+  
+  tags:
+    - "education"
+    - "ai-assistant" 
+    - "study-planning"
+    - "ollama"
+    - "local-llm"
+    - "obsidian"
+    
+  requirements:
+    python_version: ">=3.10"
+    system_requirements:
+      - "Ollama service running locally"
+      - "At least 4GB RAM for LLM inference"
+      - "Obsidian vault (optional but recommended)"
