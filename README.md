@@ -1,343 +1,109 @@
-# Academic Apex Strategist
+# 🎓 Academic Apex Teacher
 
-> AI-powered educational content generation platform with local-first privacy
+**AI-Powered Personal Learning Platform inspired by BYJU'S**
 
-Academic Apex Strategist is a comprehensive educational platform that leverages local AI models to generate study plans, quizzes, code modules, and other educational content. Built with privacy-first principles, all processing happens locally without sending data to external services.
+Transform your handwritten and typed notes into personalized, interactive learning experiences using local AI models.
 
-## 🚀 Features
+## ✨ Features
 
-### Core Functionality
-- **📝 Quiz Generation**: Create comprehensive diagnostic quizzes for any subject
-- **📅 Study Plan Generator**: Generate detailed, minute-by-minute study plans  
-- **🐍 Code Generation**: Create Python modules and utilities for academic tasks
-- **📄 Document Processing**: OCR and text extraction from PDFs and images
-- **📁 File Management**: Organize and manage all generated content
+- **📚 Smart Note Upload** - PDF, images, handwritten notes with OCR
+- **🤖 AI Teaching** - Personalized lessons in BYJU'S style  
+- **📊 Progress Tracking** - Visual analytics and learning paths
+- **🧪 Interactive Practice** - Quizzes and concept reviews
+- **🎨 Beautiful UI** - Modern interface with gradients and animations
+- **🔒 Privacy-First** - Everything runs locally with Ollama
 
-### AI & Integration
-- **🤖 Local AI Models**: Uses Ollama for completely local inference
-- **✨ Prompt Curation**: Optional curator service for enhanced prompt optimization
-- **📝 Obsidian Integration**: Automatic note saving to Obsidian vaults
-- **🔒 Privacy-First**: No data leaves your machine unless explicitly configured
+## 🚀 Quick Start
 
-### Technical Stack
-- **Backend**: FastAPI with Python 3.11+
-- **Frontend**: React 18 with TypeScript and Tailwind CSS
-- **AI**: Ollama integration with Mistral models (configurable)
-- **Infrastructure**: Docker Compose for easy deployment
-- **Storage**: Local file system with optional Obsidian sync
-
-## 📋 Requirements
-
-### System Requirements
-- **OS**: Windows 10/11, macOS 10.15+, or Linux
-- **Memory**: 8GB RAM minimum (16GB recommended for larger models)
-- **Disk**: 10GB free space (more for model storage)
-- **Python**: 3.11 or higher
-- **Node.js**: 18.x or higher (for frontend development)
-- **Docker**: Optional, for containerized deployment
-
-### Dependencies
-- **Ollama**: For local AI model inference
-- **Tesseract OCR**: For document text extraction (optional)
-- **PyMuPDF**: For PDF processing (optional)
-
-## 🛠️ Installation
-
-### Method 1: Quick Setup (Recommended)
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/academic-apex/academic-apex-project.git
-   cd academic-apex-project
-   ```
-
-2. **Install and start Ollama**
-   ```bash
-   # Install Ollama (see https://ollama.ai)
-   ollama pull mistral:7b
-   ollama serve
-   ```
-
-3. **Set up the backend**
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   python -m uvicorn main:app --reload --port 8000
-   ```
-
-4. **Set up the frontend**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-5. **Start the curator service** (optional)
-   ```bash
-   cd agentforge_academic_apex
-   python curator_service.py
-   ```
-
-6. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
-
-### Method 2: Docker Deployment
-
-1. **Clone and configure**
-   ```bash
-   git clone https://github.com/academic-apex/academic-apex-project.git
-   cd academic-apex-project
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-2. **Start with Docker Compose**
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Ensure Ollama is running locally**
-   ```bash
-   ollama pull mistral:7b
-   ollama serve
-   ```
-
-### Method 3: Executable Package
-
-Use the pre-built executable from the `agentforge_academic_apex` directory:
-
+### 1. Install Dependencies
 ```bash
-# Windows
-cd agentforge_academic_apex
-academic_apex.exe
-
-# Or run the Python launcher
-python main_launcher.py
+pip install -r requirements.txt
 ```
 
-## ⚙️ Configuration
+### 2. Install Tesseract OCR (for handwritten notes)
+- **Windows**: Download from [GitHub](https://github.com/UB-Mannheim/tesseract/wiki)
+- **Mac**: `brew install tesseract`
+- **Linux**: `sudo apt install tesseract-ocr`
 
-### Environment Variables
-
-Create a `.env` file in the project root:
-
+### 3. Start Ollama
 ```bash
-# AI Model Configuration
-OLLAMA_HOST=http://localhost:11434
-DEFAULT_MODEL=mistral:7b
-CURATOR_MODEL=mistral:7b
-
-# Service URLs
-CURATOR_SERVICE_URL=http://localhost:5001
-
-# Obsidian Integration
-OBSIDIAN_VAULT_PATH=/path/to/your/obsidian/vault
-
-# File Storage
-UPLOAD_DIR=./uploads
-GENERATED_DIR=./generated
-
-# Development
-DEBUG=false
-WEB_UI_PORT=3000
-API_PORT=8000
-```
-
-### Ollama Models
-
-Recommended models (choose based on your hardware):
-
-```bash
-# Lightweight (4GB RAM)
+ollama serve
 ollama pull mistral:7b
-
-# Balanced (8GB RAM)
-ollama pull llama2:13b
-
-# High-quality (16GB+ RAM)
-ollama pull codellama:34b
 ```
 
-### Obsidian Integration
-
-1. Install Obsidian and create a vault
-2. Set `OBSIDIAN_VAULT_PATH` to your vault directory
-3. Generated content will automatically appear in `AcademicApex/` folders
-
-## 🎯 Usage
-
-### Quick Start Guide
-
-1. **Ensure system health**: Check the dashboard for green status indicators
-2. **Generate your first quiz**:
-   - Navigate to "Generate Quiz"
-   - Enter a subject (e.g., "Python Programming Basics")
-   - Select difficulty and number of questions
-   - Click "Generate"
-3. **Create a study plan**:
-   - Go to "Study Plan" 
-   - Specify subject and duration
-   - Add learning objectives
-   - Generate your personalized plan
-4. **Manage your content**: Use "File Manager" to view, download, or organize generated files
-
-### Advanced Features
-
-#### Document Upload & Processing
+### 4. Run the App
 ```bash
-# Upload and process documents via API
-curl -X POST "http://localhost:8000/api/upload-document" \
-  -F "file=@document.pdf"
+streamlit run academic_apex_teacher.py
 ```
 
-#### Prompt Curation
-Enable the curator service for enhanced prompt optimization:
-- Better question quality
-- More focused content generation
-- Improved educational value
+### 5. Open in Browser
+Visit: `http://localhost:8501`
 
-#### Obsidian Workflow
-1. Generate content in Academic Apex
-2. Content automatically syncs to Obsidian
-3. Use Obsidian's linking and organization features
-4. Build your personal knowledge base
+## 📱 How to Use
 
-## 🧪 Testing
+1. **Upload Notes** - PDF files, images of handwritten notes, or text files
+2. **AI Analysis** - Watch as AI extracts concepts and creates learning paths  
+3. **Start Learning** - Interactive lessons with step-by-step explanations
+4. **Practice & Track** - Take quizzes and monitor your progress
+5. **Get Feedback** - Receive personalized AI feedback on your answers
 
-### Run Smoke Tests
-```bash
-cd agentforge_academic_apex
-python smoke_tests.py
-```
+## 🌐 Deploy to Cloud
 
-### Backend Tests
-```bash
-cd backend
-pytest
-```
+### Streamlit Cloud (FREE)
+1. Push to GitHub: `git push origin main`
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Connect your repo and deploy with `academic_apex_teacher.py`
 
-### Frontend Tests
-```bash
-cd frontend
-npm test
-```
+## 📋 Files
 
-### Integration Tests
-```bash
-# Test the full pipeline
-python -m pytest tests/integration/
-```
+- `academic_apex_teacher.py` - Main BYJU'S-style application
+- `ollama_adapter.py` - AI model interface
+- `obsidian_adapter.py` - Note management (optional)
+- `requirements.txt` - Python dependencies
+- `DEPLOYMENT_GUIDE.md` - Detailed deployment instructions
 
-## 🐛 Troubleshooting
+## 🎯 BYJU'S-Style Features
 
-### Common Issues
+- **Bite-sized Learning** - 15-30 minute focused sessions
+- **Interactive Explanations** - Step-by-step with real-world examples
+- **Adaptive Difficulty** - Adjusts based on your progress  
+- **Visual Progress** - Charts and streak tracking
+- **Personalized Feedback** - AI evaluates your answers
 
-**❌ "Ollama connection failed"**
-- Ensure Ollama is running: `ollama serve`
-- Check the model is downloaded: `ollama list`
-- Verify the host URL in your configuration
+## 💡 Tips for Best Results
 
-**❌ "Curator service offline"**
-- Start the curator: `python curator_service.py`
-- Check port 5001 is available
-- Verify Ollama connectivity
+- **Clear Images**: Use good lighting for handwritten notes
+- **Engage Actively**: Answer practice questions in the lessons
+- **Regular Practice**: Take quizzes to reinforce learning
+- **Track Progress**: Review analytics to identify weak areas
 
-**❌ "Obsidian vault issues"**
-- Ensure the vault path exists and is writable
-- Check permissions on the vault directory
-- Verify the path in your environment variables
+## 🔧 Troubleshooting
 
-**❌ "OCR processing failed"**
-- Install Tesseract: `apt-get install tesseract-ocr` (Linux) or `brew install tesseract` (macOS)
-- For Windows: Download from [GitHub](https://github.com/UB-Mannheim/tesseract/wiki)
+**OCR not working?**
+- Install Tesseract OCR for your operating system
+- Ensure images are clear and well-lit
 
-**❌ "Slow generation times"**
-- Use smaller models (e.g., mistral:7b instead of llama2:70b)
-- Reduce max_tokens in requests
-- Ensure sufficient RAM and CPU resources
+**AI responses slow?**  
+- Check that Ollama is running: `ollama serve`
+- Try smaller models if your system is limited
 
-### Performance Optimization
-
-1. **Model Selection**: Choose models appropriate for your hardware
-2. **Token Limits**: Reduce max_tokens for faster generation
-3. **Caching**: Enable prompt caching in the curator service
-4. **Hardware**: Use GPU acceleration if available
-
-### Debug Mode
-
-Enable debug mode for detailed logging:
-```bash
-DEBUG=true python main_launcher.py
-```
-
-## 🏗️ Architecture
-
-### System Overview
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  React Frontend │────│  FastAPI Backend│────│     Ollama      │
-│   (Port 3000)   │    │   (Port 8000)   │    │  (Port 11434)   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │
-         │              ┌─────────────────┐
-         │              │ Curator Service │
-         └──────────────│   (Port 5001)   │
-                        └─────────────────┘
-                                 │
-                        ┌─────────────────┐
-                        │ Obsidian Vault  │
-                        │  (File System)  │
-                        └─────────────────┘
-```
-
-### Component Responsibilities
-
-- **Frontend**: React SPA with TypeScript, handles UI/UX
-- **Backend**: FastAPI service, manages API endpoints and business logic
-- **Curator**: Flask service for prompt optimization and curation
-- **Ollama**: Local AI inference engine
-- **File System**: Local storage for generated content and uploads
+**Deployment issues?**
+- Verify all requirements are installed
+- Check that environment variables are set correctly
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Setup
+Feel free to contribute improvements, bug fixes, or new features!
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and add tests
-4. Run the test suite: `npm test && pytest`
-5. Commit your changes: `git commit -m 'Add amazing feature'`
-6. Push to the branch: `git push origin feature/amazing-feature`
-7. Open a Pull Request
-
-### Code Style
-
-- **Python**: Follow PEP 8, use Black for formatting
-- **TypeScript**: Follow ESLint rules, use Prettier for formatting
-- **Commits**: Use conventional commits format
+2. Create a feature branch
+3. Make your changes  
+4. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Ollama** for providing excellent local AI inference
-- **Mistral AI** for the foundational language models
-- **React & FastAPI** communities for excellent frameworks
-- **Obsidian** for inspiring knowledge management integration
-
-## 🔗 Links
-
-- **Documentation**: [docs.academic-apex.dev](https://docs.academic-apex.dev)
-- **Issues**: [GitHub Issues](https://github.com/academic-apex/academic-apex-project/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/academic-apex/academic-apex-project/discussions)
-- **Roadmap**: [Project Roadmap](https://github.com/academic-apex/academic-apex-project/projects)
+MIT License - feel free to use for educational purposes!
 
 ---
 
-**Built with ❤️ for local-first AI education**
+**Transform your notes into a complete learning experience with AI! 🎓✨**
