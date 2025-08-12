@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Academic Apex Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold mb-3">
+            <i class="fas fa-cog text-warning"></i>
+            Settings
+        </h1>
+        <p class="text-lg opacity-70">
+            Configure Academic Apex Strategist for your needs
+        </p>
+    </div>
+
+    <!-- Current Configuration -->
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-xl mb-4">
+                <i class="fas fa-info-circle text-info"></i>
+                Current Configuration
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="stat bg-base-100 rounded-lg">
+                    <div class="stat-title">Ollama Host</div>
+                    <div class="stat-value text-lg">{{ config.ollama_host }}</div>
+                    <div class="stat-desc">Local LLM service</div>
+                </div>
+                
+                <div class="stat bg-base-100 rounded-lg">
+                    <div class="stat-title">Curator Service</div>
+                    <div class="stat-value text-lg">{{ config.curator_url }}</div>
+                    <div class="stat-desc">Prompt optimization</div>
+                </div>
+                
+                <div class="stat bg-base-100 rounded-lg">
+                    <div class="stat-title">Web UI Port</div>
+                    <div class="stat-value text-lg">{{ config.app_port }}</div>
+                    <div class="stat-desc">This interface</div>
+                </div>
+                
+                <div class="stat bg-base-100 rounded-lg">
+                    <div class="stat-title">Obsidian Vault</div>
+                    <div class="stat-value text-sm">
+                        {{ config.vault_path[:30] + '...' if config.vault_path and config.vault_path|length > 30 else config.vault_path or 'Not configured' }}
+                    </div>
+                    <div class="stat-desc">Note storage location</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Environment Variables Guide -->
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-xl mb-4">
+                <i class="fas fa-terminal text-primary"></i>
+                Environment Variables
+            </h2>
+            
+            <p class="mb-4 opacity-80">
+                Academic Apex Strategist is configured using environment variables. Set these before starting the application:
+            </p>
+            
+            <div class="space-y-4">
+                <!-- Required Variables -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 text-success">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Required Variables
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th>Variable</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code class="bg-base-300 px-2 py-1 rounded">OBSIDIAN_VAULT_PATH</code></td>
+                                    <td>Path to your Obsidian vault directory</td>
+                                    <td><code class="text-sm">/Users/you/Documents/MyVault</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Optional Variables -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 text-info">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Optional Variables
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th>Variable</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code class="bg-base-300 px-2 py-1 rounded">OLLAMA_HOST</code></td>
+                                    <td><code>http://localhost:11434</code></td>
+                                    <td>Ollama API endpoint</td>
+                                </tr>
+                                <tr>
+                                    <td><code class="bg-base-300 px-2 py-1 rounded">CURATOR_MODEL</code></td>
+                                    <td><code>mistral-7b</code></td>
+                                    <td>Model for prompt curation</td>
+                                </tr>
+                                <tr>
+                                    <td><code class="bg-base-300 px-2 py-1 rounded">CURATOR_SERVICE_URL</code></td>
+                                    <td><code>http://localhost:5001</code></td>
+                                    <td>Curator service URL</td>
+                                </tr>
+                                <tr>
+                                    <td><code class="bg-base-300 px-2 py-1 rounded">WEB_UI_PORT</code></td>
+                                    <td><code>5000</code></td>
+                                    <td>Port for web interface</td>
+                                </tr>
+                                <tr>
+                                    <td><code class="bg-base-300 px-2 py-1 rounded">DEBUG</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Enable debug mode</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Setup Instructions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Windows Setup -->
+        <div class="card bg-gradient-to-br from-blue-50 to-blue-100 shadow-xl">
+            <div class="card-body">
+                <h3 class="card-title text-lg">
+                    <i class="fab fa-windows text-blue-600"></i>
+                    Windows Setup
+                </h3>
+                
+                <div class="space-y-3">
+                    <div>
+                        <h4 class="font-semibold text-sm">PowerShell:</h4>
+                        <div class="mockup-code text-xs">
+                            <pre><code>$env:OBSIDIAN_VAULT_PATH="C:\Users\You\Documents\MyVault"
+$env:OLLAMA_HOST="http://localhost:11434"
+$env:CURATOR_MODEL="mistral-7b"</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-sm">Command Prompt:</h4>
+                        <div class="mockup-code text-xs">
+                            <pre><code>set OBSIDIAN_VAULT_PATH=C:\Users\You\Documents\MyVault
+set OLLAMA_HOST=http://localhost:11434</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- macOS/Linux Setup -->
+        <div class="card bg-gradient-to-br from-green-50 to-green-100 shadow-xl">
+            <div class="card-body">
+                <h3 class="card-title text-lg">
+                    <i class="fab fa-apple text-green-600"></i>
+                    macOS / Linux Setup
+                </h3>
+                
+                <div class="space-y-3">
+                    <div>
+                        <h4 class="font-semibold text-sm">Terminal:</h4>
+                        <div class="mockup-code text-xs">
+                            <pre><code>export OBSIDIAN_VAULT_PATH="/Users/you/Documents/MyVault"
+export OLLAMA_HOST="http://localhost:11434"
+export CURATOR_MODEL="mistral-7b"</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-sm">Add to ~/.bashrc or ~/.zshrc:</h4>
+                        <div class="mockup-code text-xs">
+                            <pre><code># Academic Apex Configuration
+export OBSIDIAN_VAULT_PATH="/path/to/vault"</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Status -->
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-xl mb-4">
+                <i class="fas fa-heartbeat text-error"></i>
+                Service Status
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="service-status">
+                <!-- Will be populated by JavaScript -->
+                <div class="text-center py-4">
+                    <div class="loading loading-spinner loading-md"></div>
+                    <p class="mt-2 text-sm opacity-70">Checking services...</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button onclick="checkServices()" class="btn btn-primary btn-sm">
+                    <i class="fas fa-refresh mr-1"></i>
+                    Refresh Status
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-xl mb-4">
+                <i class="fas fa-wrench text-warning"></i>
+                Troubleshooting
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="collapse collapse-arrow bg-base-300">
+                    <input type="radio" name="troubleshoot-accordion" checked="checked" /> 
+                    <div class="collapse-title text-lg font-medium">
+                        🤖 Ollama Issues
+                    </div>
+                    <div class="collapse-content"> 
+                        <ul class="list-disc list-inside space-y-2 text-sm">
+                            <li><strong>Service not running:</strong> Start with <code class="bg-base-100 px-1 rounded">ollama serve</code></li>
+                            <li><strong>Models missing:</strong> Pull models with <code class="bg-base-100 px-1 rounded">ollama pull deepseek-coder</code></li>
+                            <li><strong>Port conflicts:</strong> Check if port 11434 is available</li>
+                            <li><strong>Permission issues:</strong> Ensure user has access to Ollama installation</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="collapse collapse-arrow bg-base-300">
+                    <input type="radio" name="troubleshoot-accordion" /> 
+                    <div class="collapse-title text-lg font-medium">
+                        🎯 Curator Service Issues
+                    </div>
+                    <div class="collapse-content">
+                        <ul class="list-disc list-inside space-y-2 text-sm">
+                            <li><strong>Service not starting:</strong> Run <code class="bg-base-100 px-1 rounded">python curator_service.py</code> manually</li>
+                            <li><strong>Port conflicts:</strong> Change port with <code class="bg-base-100 px-1 rounded">CURATOR_SERVICE_URL</code></li>
+                            <li><strong>Model errors:</strong> Verify curator model is installed in Ollama</li>
+                            <li><strong>Timeout issues:</strong> Increase timeout in curator service settings</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="collapse collapse-arrow bg-base-300">
+                    <input type="radio" name="troubleshoot-accordion" /> 
+                    <div class="collapse-title text-lg font-medium">
+                        📝 Obsidian Integration Issues
+                    </div>
+                    <div class="collapse-content">
+                        <ul class="list-disc list-inside space-y-2 text-sm">
+                            <li><strong>Path not found:</strong> Verify <code class="bg-base-100 px-1 rounded">OBSIDIAN_VAULT_PATH</code> points to existing directory</li>
+                            <li><strong>Permission denied:</strong> Ensure write permissions to vault directory</li>
+                            <li><strong>Files not appearing:</strong> Check if Obsidian is watching the AcademicApex folder</li>
+                            <li><strong>Sync conflicts:</strong> Disable auto-sync in Obsidian during generation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links -->
+    <div class="text-center space-x-4 pt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-ghost">
+            <i class="fas fa-home mr-1"></i>
+            Back to Dashboard
+        </a>
+        <a href="https://ollama.ai/" target="_blank" class="btn btn-ghost">
+            <i class="fas fa-external-link-alt mr-1"></i>
+            Ollama Documentation
+        </a>
+        <a href="https://obsidian.md/" target="_blank" class="btn btn-ghost">
+            <i class="fas fa-external-link-alt mr-1"></i>
+            Obsidian Help
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function checkServices() {
+    const statusContainer = document.getElementById('service-status');
+    statusContainer.innerHTML = `
+        <div class="text-center py-4">
+            <div class="loading loading-spinner loading-md"></div>
+            <p class="mt-2 text-sm opacity-70">Checking services...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch('/api/system-status');
+        const status = await response.json();
+        
+        statusContainer.innerHTML = `
+            <div class="stat bg-base-100 rounded-lg">
+                <div class="stat-figure">
+                    <i class="fas fa-robot text-2xl ${status.ollama_connected ? 'text-success' : 'text-error'}"></i>
+                </div>
+                <div class="stat-title">Ollama</div>
+                <div class="stat-value text-sm ${status.ollama_connected ? 'text-success' : 'text-error'}">
+                    ${status.ollama_connected ? 'Connected' : 'Offline'}
+                </div>
+                <div class="stat-desc">${status.models_available ? status.models_available.length : 0} models</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg">
+                <div class="stat-figure">
+                    <i class="fas fa-cogs text-2xl ${status.curator_running ? 'text-success' : 'text-error'}"></i>
+                </div>
+                <div class="stat-title">Curator</div>
+                <div class="stat-value text-sm ${status.curator_running ? 'text-success' : 'text-error'}">
+                    ${status.curator_running ? 'Running' : 'Stopped'}
+                </div>
+                <div class="stat-desc">Prompt service</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg">
+                <div class="stat-figure">
+                    <i class="fas fa-folder text-2xl ${status.obsidian_configured ? 'text-success' : 'text-warning'}"></i>
+                </div>
+                <div class="stat-title">Obsidian</div>
+                <div class="stat-value text-sm ${status.obsidian_configured ? 'text-success' : 'text-warning'}">
+                    ${status.obsidian_configured ? 'Ready' : 'Not Set'}
+                </div>
+                <div class="stat-desc">Vault integration</div>
+            </div>
+        `;
+        
+        // Show issues if any
+        if (status.issues && status.issues.length > 0) {
+            const issuesHtml = status.issues.slice(0, 3).map(issue => 
+                `<li class="text-sm">• ${issue}</li>`
+            ).join('');
+            
+            statusContainer.innerHTML += `
+                <div class="col-span-3 mt-4">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <h4 class="font-bold">Issues Detected</h4>
+                            <ul class="mt-1">${issuesHtml}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        statusContainer.innerHTML = `
+            <div class="col-span-3 text-center py-4">
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Failed to check service status: ${error.message}</span>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Check services on page load
+document.addEventListener('DOMContentLoaded', checkServices);
+
+// Auto-refresh every 30 seconds
+setInterval(checkServices, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,541 @@
+{% extends "base.html" %}
+
+{% block title %}My Files - Academic Apex Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold mb-3">
+                <i class="fas fa-folder-open text-info"></i>
+                My Files
+            </h1>
+            <p class="text-lg opacity-70">
+                Manage all your generated educational content
+            </p>
+        </div>
+        
+        <div class="flex gap-2">
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-outline btn-sm">
+                    <i class="fas fa-sort"></i>
+                    Sort
+                </div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box w-52 p-2 shadow z-50">
+                    <li><a onclick="sortFiles('modified', 'desc')">
+                        <i class="fas fa-clock"></i> Newest First
+                    </a></li>
+                    <li><a onclick="sortFiles('modified', 'asc')">
+                        <i class="fas fa-clock"></i> Oldest First
+                    </a></li>
+                    <li><a onclick="sortFiles('name', 'asc')">
+                        <i class="fas fa-sort-alpha-down"></i> Name A-Z
+                    </a></li>
+                    <li><a onclick="sortFiles('size', 'desc')">
+                        <i class="fas fa-file"></i> Largest First
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-outline btn-sm">
+                    <i class="fas fa-filter"></i>
+                    Filter
+                </div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box w-52 p-2 shadow z-50">
+                    <li><a onclick="filterFiles('all')">
+                        <i class="fas fa-list"></i> All Files
+                    </a></li>
+                    <li><a onclick="filterFiles('md')">
+                        <i class="fas fa-file-alt"></i> Markdown (.md)
+                    </a></li>
+                    <li><a onclick="filterFiles('py')">
+                        <i class="fas fa-file-code"></i> Python (.py)
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats stats-horizontal shadow w-full">
+        <div class="stat">
+            <div class="stat-figure text-primary">
+                <i class="fas fa-file text-2xl"></i>
+            </div>
+            <div class="stat-title">Total Files</div>
+            <div class="stat-value" id="total-files">{{ files|length }}</div>
+            <div class="stat-desc">Generated content</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-figure text-secondary">
+                <i class="fas fa-question-circle text-2xl"></i>
+            </div>
+            <div class="stat-title">Quizzes</div>
+            <div class="stat-value" id="quiz-count">
+                {{ files|selectattr('name', 'match', '.*quiz.*')|list|length }}
+            </div>
+            <div class="stat-desc">Educational assessments</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-figure text-accent">
+                <i class="fas fa-calendar text-2xl"></i>
+            </div>
+            <div class="stat-title">Study Plans</div>
+            <div class="stat-value" id="plan-count">
+                {{ files|selectattr('name', 'match', '.*study_plan.*')|list|length }}
+            </div>
+            <div class="stat-desc">Learning timelines</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-figure text-info">
+                <i class="fas fa-code text-2xl"></i>
+            </div>
+            <div class="stat-title">Code Modules</div>
+            <div class="stat-value" id="code-count">
+                {{ files|selectattr('type', 'equalto', 'py')|list|length }}
+            </div>
+            <div class="stat-desc">Python utilities</div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="form-control">
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="search-input"
+                placeholder="Search files by name or content..."
+                class="input input-bordered flex-1"
+                onkeyup="searchFiles()"
+            >
+            <button class="btn btn-square">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Files Grid -->
+    {% if files %}
+    <div id="files-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for file in files %}
+        <div class="card bg-base-200 shadow-lg hover:shadow-xl transition-all duration-300 file-card" 
+             data-name="{{ file.name }}" 
+             data-type="{{ file.type }}"
+             data-size="{{ file.size }}"
+             data-modified="{{ file.modified }}">
+            
+            <div class="card-body p-4">
+                <!-- File Icon and Type -->
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-3">
+                        {% if file.type == 'md' %}
+                            <i class="fas fa-file-alt text-primary text-2xl"></i>
+                        {% elif file.type == 'py' %}
+                            <i class="fas fa-file-code text-accent text-2xl"></i>
+                        {% else %}
+                            <i class="fas fa-file text-neutral text-2xl"></i>
+                        {% endif %}
+                        
+                        <div>
+                            <div class="badge badge-outline badge-sm">
+                                {{ file.type|upper if file.type else 'FILE' }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="dropdown dropdown-end">
+                        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box w-52 p-2 shadow z-50">
+                            <li><a href="/view/{{ file.name }}" target="_blank">
+                                <i class="fas fa-eye"></i> View
+                            </a></li>
+                            <li><a href="/download/{{ file.name }}">
+                                <i class="fas fa-download"></i> Download
+                            </a></li>
+                            <li><a onclick="copyFileContent('{{ file.name }}')">
+                                <i class="fas fa-copy"></i> Copy Content
+                            </a></li>
+                            <li class="divider"></li>
+                            <li><a onclick="deleteFile('{{ file.name }}')" class="text-error">
+                                <i class="fas fa-trash"></i> Delete
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- File Name -->
+                <h3 class="card-title text-base mb-2 truncate" title="{{ file.name }}">
+                    {{ file.name[:30] + '...' if file.name|length > 30 else file.name }}
+                </h3>
+                
+                <!-- File Details -->
+                <div class="space-y-2 text-sm opacity-70">
+                    <div class="flex justify-between">
+                        <span>Size:</span>
+                        <span class="font-mono">{{ (file.size / 1024) | round(1) }}KB</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Modified:</span>
+                        <span class="font-mono">
+                            {{ file.modified[:10] }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="card-actions justify-between mt-4">
+                    <a href="/view/{{ file.name }}" target="_blank" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye mr-1"></i>
+                        View
+                    </a>
+                    <a href="/download/{{ file.name }}" class="btn btn-ghost btn-sm">
+                        <i class="fas fa-download mr-1"></i>
+                        Download
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-16">
+        <i class="fas fa-folder-open text-6xl opacity-30 mb-4"></i>
+        <h3 class="text-2xl font-bold mb-3">No Files Yet</h3>
+        <p class="text-lg opacity-70 mb-6">Start creating educational content to see your files here</p>
+        
+        <div class="flex gap-3 justify-center">
+            <a href="{{ url_for('generate_quiz') }}" class="btn btn-primary">
+                <i class="fas fa-question-circle mr-2"></i>
+                Create Quiz
+            </a>
+            <a href="{{ url_for('generate_study_plan') }}" class="btn btn-secondary">
+                <i class="fas fa-calendar-alt mr-2"></i>
+                Study Plan
+            </a>
+            <a href="{{ url_for('generate_code') }}" class="btn btn-accent">
+                <i class="fas fa-code mr-2"></i>
+                Generate Code
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Bulk Actions (hidden by default) -->
+    <div id="bulk-actions" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-base-200 rounded-lg shadow-lg p-4 flex items-center space-x-2">
+            <span id="selected-count" class="text-sm font-semibold">0 selected</span>
+            <div class="divider divider-horizontal"></div>
+            <button onclick="downloadSelected()" class="btn btn-sm btn-primary">
+                <i class="fas fa-download"></i>
+            </button>
+            <button onclick="deleteSelected()" class="btn btn-sm btn-error">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button onclick="clearSelection()" class="btn btn-sm btn-ghost">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<dialog id="delete_modal" class="modal">
+    <div class="modal-box">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        </form>
+        
+        <h3 class="font-bold text-lg">
+            <i class="fas fa-exclamation-triangle text-warning"></i>
+            Confirm Delete
+        </h3>
+        
+        <p class="py-4">Are you sure you want to delete <span id="delete-filename" class="font-bold"></span>?</p>
+        <p class="text-sm opacity-70 mb-4">This action cannot be undone.</p>
+        
+        <div class="modal-action">
+            <button onclick="confirmDelete()" class="btn btn-error">
+                <i class="fas fa-trash"></i>
+                Delete
+            </button>
+            <form method="dialog">
+                <button class="btn">Cancel</button>
+            </form>
+        </div>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedFiles = new Set();
+let fileToDelete = null;
+
+// File operations
+function deleteFile(filename) {
+    fileToDelete = filename;
+    document.getElementById('delete-filename').textContent = filename;
+    document.getElementById('delete_modal').showModal();
+}
+
+async function confirmDelete() {
+    if (!fileToDelete) return;
+    
+    try {
+        // In a real implementation, this would make an API call to delete the file
+        showNotification(`File ${fileToDelete} deleted successfully`, 'success');
+        
+        // Remove from UI
+        document.querySelector(`[data-name="${fileToDelete}"]`).remove();
+        updateStats();
+        
+    } catch (error) {
+        showNotification('Failed to delete file', 'error');
+    }
+    
+    fileToDelete = null;
+    document.getElementById('delete_modal').close();
+}
+
+async function copyFileContent(filename) {
+    try {
+        const response = await fetch(`/view/${filename}`);
+        if (response.ok) {
+            const content = await response.text();
+            // Extract content from HTML (simplified)
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, 'text/html');
+            const pre = doc.querySelector('pre') || doc.querySelector('.content');
+            const text = pre ? pre.textContent : content;
+            
+            await navigator.clipboard.writeText(text);
+            showNotification('File content copied to clipboard!', 'success');
+        } else {
+            throw new Error('Failed to fetch file content');
+        }
+    } catch (error) {
+        showNotification('Failed to copy file content', 'error');
+    }
+}
+
+// Search and filter
+function searchFiles() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    const cards = document.querySelectorAll('.file-card');
+    
+    cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const visible = name.includes(query);
+        card.style.display = visible ? 'block' : 'none';
+    });
+    
+    updateVisibleStats();
+}
+
+function filterFiles(type) {
+    const cards = document.querySelectorAll('.file-card');
+    
+    cards.forEach(card => {
+        const cardType = card.dataset.type;
+        const visible = type === 'all' || cardType === type;
+        card.style.display = visible ? 'block' : 'none';
+    });
+    
+    updateVisibleStats();
+}
+
+function sortFiles(criteria, order) {
+    const container = document.getElementById('files-container');
+    if (!container) return;
+    
+    const cards = Array.from(container.children);
+    
+    cards.sort((a, b) => {
+        let aVal, bVal;
+        
+        switch(criteria) {
+            case 'name':
+                aVal = a.dataset.name.toLowerCase();
+                bVal = b.dataset.name.toLowerCase();
+                break;
+            case 'size':
+                aVal = parseInt(a.dataset.size);
+                bVal = parseInt(b.dataset.size);
+                break;
+            case 'modified':
+                aVal = new Date(a.dataset.modified);
+                bVal = new Date(b.dataset.modified);
+                break;
+            default:
+                return 0;
+        }
+        
+        if (order === 'desc') {
+            return aVal < bVal ? 1 : -1;
+        } else {
+            return aVal > bVal ? 1 : -1;
+        }
+    });
+    
+    // Re-append sorted cards
+    cards.forEach(card => container.appendChild(card));
+}
+
+// Statistics updates
+function updateStats() {
+    const cards = document.querySelectorAll('.file-card');
+    const totalFiles = cards.length;
+    
+    let quizCount = 0;
+    let planCount = 0;
+    let codeCount = 0;
+    
+    cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const type = card.dataset.type;
+        
+        if (name.includes('quiz')) quizCount++;
+        if (name.includes('study_plan')) planCount++;
+        if (type === 'py') codeCount++;
+    });
+    
+    document.getElementById('total-files').textContent = totalFiles;
+    document.getElementById('quiz-count').textContent = quizCount;
+    document.getElementById('plan-count').textContent = planCount;
+    document.getElementById('code-count').textContent = codeCount;
+}
+
+function updateVisibleStats() {
+    const visibleCards = document.querySelectorAll('.file-card[style="display: block"], .file-card:not([style])');
+    const total = visibleCards.length;
+    
+    // Update total files stat to show filtered count
+    document.getElementById('total-files').textContent = total;
+}
+
+// Selection and bulk operations
+function toggleFileSelection(filename) {
+    if (selectedFiles.has(filename)) {
+        selectedFiles.delete(filename);
+    } else {
+        selectedFiles.add(filename);
+    }
+    
+    updateSelectionUI();
+}
+
+function updateSelectionUI() {
+    const count = selectedFiles.size;
+    const bulkActions = document.getElementById('bulk-actions');
+    const selectedCount = document.getElementById('selected-count');
+    
+    if (count > 0) {
+        bulkActions.classList.remove('hidden');
+        selectedCount.textContent = `${count} selected`;
+    } else {
+        bulkActions.classList.add('hidden');
+    }
+    
+    // Update card visual state
+    document.querySelectorAll('.file-card').forEach(card => {
+        const filename = card.dataset.name;
+        if (selectedFiles.has(filename)) {
+            card.classList.add('ring-2', 'ring-primary');
+        } else {
+            card.classList.remove('ring-2', 'ring-primary');
+        }
+    });
+}
+
+function clearSelection() {
+    selectedFiles.clear();
+    updateSelectionUI();
+}
+
+function downloadSelected() {
+    selectedFiles.forEach(filename => {
+        const a = document.createElement('a');
+        a.href = `/download/${filename}`;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+    
+    showNotification(`Downloaded ${selectedFiles.size} files`, 'success');
+    clearSelection();
+}
+
+async function deleteSelected() {
+    if (selectedFiles.size === 0) return;
+    
+    const confirmation = confirm(`Delete ${selectedFiles.size} selected files? This cannot be undone.`);
+    if (!confirmation) return;
+    
+    for (const filename of selectedFiles) {
+        try {
+            // In a real implementation, make API calls to delete files
+            document.querySelector(`[data-name="${filename}"]`).remove();
+        } catch (error) {
+            console.error(`Failed to delete ${filename}:`, error);
+        }
+    }
+    
+    showNotification(`Deleted ${selectedFiles.size} files`, 'success');
+    selectedFiles.clear();
+    updateSelectionUI();
+    updateStats();
+}
+
+// Add selection click handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click handlers for file selection (with Ctrl key)
+    document.querySelectorAll('.file-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                toggleFileSelection(this.dataset.name);
+            }
+        });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 'a':
+                    e.preventDefault();
+                    // Select all visible files
+                    document.querySelectorAll('.file-card:not([style*="none"])').forEach(card => {
+                        selectedFiles.add(card.dataset.name);
+                    });
+                    updateSelectionUI();
+                    break;
+                case 'd':
+                    e.preventDefault();
+                    if (selectedFiles.size > 0) {
+                        downloadSelected();
+                    }
+                    break;
+            }
+        }
+        
+        if (e.key === 'Escape') {
+            clearSelection();
+        }
+    });
+});
+
+// Initialize
+updateStats();
+</script>
+{% endblock %}

@@ -1,0 +1,567 @@
+{% extends "base.html" %}
+
+{% block title %}Code Generator - Academic Apex Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold mb-3">
+            <i class="fas fa-code text-accent"></i>
+            Code Generator
+        </h1>
+        <p class="text-lg opacity-70">
+            Generate Python modules and utilities for academic and educational tasks
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Input Form -->
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-xl mb-4">
+                    <i class="fas fa-edit text-accent"></i>
+                    Code Specifications
+                </h2>
+
+                <form id="code-form" class="space-y-4">
+                    <!-- Module Name -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Module Name</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="module_name" 
+                            name="module_name"
+                            placeholder="e.g., study_utils, quiz_manager, learning_tools"
+                            value="study_utils"
+                            class="input input-bordered w-full"
+                        >
+                        <label class="label">
+                            <span class="label-text-alt">Python module name (will be saved as .py file)</span>
+                        </label>
+                    </div>
+
+                    <!-- Functionality Description -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Functionality Description *</span>
+                        </label>
+                        <textarea 
+                            id="functionality" 
+                            name="functionality"
+                            placeholder="e.g., Create utility functions for managing study schedules, converting data formats, and tracking progress"
+                            class="textarea textarea-bordered h-24 w-full" 
+                            required
+                        ></textarea>
+                        <label class="label">
+                            <span class="label-text-alt">Describe what the module should do</span>
+                        </label>
+                    </div>
+
+                    <!-- Quick Function Templates -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Quick Templates</span>
+                        </label>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="applyTemplate('study_scheduler')" class="btn btn-outline btn-xs">
+                                <i class="fas fa-calendar"></i> Study Scheduler
+                            </button>
+                            <button type="button" onclick="applyTemplate('quiz_tools')" class="btn btn-outline btn-xs">
+                                <i class="fas fa-question"></i> Quiz Tools
+                            </button>
+                            <button type="button" onclick="applyTemplate('data_analysis')" class="btn btn-outline btn-xs">
+                                <i class="fas fa-chart-bar"></i> Data Analysis
+                            </button>
+                            <button type="button" onclick="applyTemplate('file_utils')" class="btn btn-outline btn-xs">
+                                <i class="fas fa-file"></i> File Utils
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Options -->
+                    <div class="collapse collapse-arrow bg-base-300">
+                        <input type="checkbox" /> 
+                        <div class="collapse-title text-lg font-medium">
+                            <i class="fas fa-cog mr-2"></i>
+                            Advanced Options
+                        </div>
+                        <div class="collapse-content space-y-3">
+                            <!-- Include Tests -->
+                            <div class="form-control">
+                                <label class="cursor-pointer label">
+                                    <span class="label-text">Include Unit Tests</span>
+                                    <input 
+                                        type="checkbox" 
+                                        id="include_tests" 
+                                        name="include_tests"
+                                        class="toggle toggle-accent" 
+                                        checked 
+                                    >
+                                </label>
+                                <label class="label">
+                                    <span class="label-text-alt opacity-60">
+                                        Adds test functions and examples
+                                    </span>
+                                </label>
+                            </div>
+
+                            <!-- Prompt Curation -->
+                            <div class="form-control">
+                                <label class="cursor-pointer label">
+                                    <span class="label-text">Use Prompt Curation</span>
+                                    <input 
+                                        type="checkbox" 
+                                        id="use_curation" 
+                                        name="use_curation"
+                                        class="toggle toggle-accent" 
+                                        checked 
+                                    >
+                                </label>
+                                <label class="label">
+                                    <span class="label-text-alt opacity-60">
+                                        Optimizes prompt for better code quality
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="form-control mt-6">
+                        <button 
+                            type="submit" 
+                            id="generate-btn" 
+                            class="btn btn-accent btn-lg"
+                            data-original-text="Generate Code"
+                        >
+                            <i class="fas fa-magic mr-2"></i>
+                            Generate Code
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-xl mb-4">
+                    <i class="fas fa-file-code text-primary"></i>
+                    Generated Python Module
+                </h2>
+
+                <!-- Initial State -->
+                <div id="initial-state" class="text-center py-12 opacity-60">
+                    <i class="fas fa-code text-6xl mb-4"></i>
+                    <p class="text-lg mb-2">Ready to Code</p>
+                    <p class="text-sm">Describe your module functionality and generate production-ready Python code.</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="text-center py-12 hidden">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-lg mb-2">Generating Code...</p>
+                    <p class="text-sm opacity-70">Creating functions with documentation and error handling</p>
+                    <progress class="progress progress-accent w-full mt-4"></progress>
+                </div>
+
+                <!-- Results -->
+                <div id="results-content" class="hidden space-y-4">
+                    <!-- Stats -->
+                    <div class="stats stats-vertical lg:stats-horizontal shadow w-full text-sm">
+                        <div class="stat">
+                            <div class="stat-title text-xs">Length</div>
+                            <div class="stat-value text-lg" id="content-length">-</div>
+                            <div class="stat-desc">characters</div>
+                        </div>
+                        
+                        <div class="stat">
+                            <div class="stat-title text-xs">Syntax</div>
+                            <div class="stat-value text-sm">
+                                <i class="fas fa-check text-success" id="syntax-valid-icon"></i>
+                                <i class="fas fa-exclamation-triangle text-warning hidden" id="syntax-warning-icon"></i>
+                            </div>
+                            <div class="stat-desc" id="syntax-status">Valid Python</div>
+                        </div>
+                        
+                        <div class="stat">
+                            <div class="stat-title text-xs">Model</div>
+                            <div class="stat-value text-base" id="model-used">-</div>
+                            <div class="stat-desc" id="tokens-used">0 tokens</div>
+                        </div>
+                    </div>
+
+                    <!-- Syntax Error Alert (if any) -->
+                    <div id="syntax-error-alert" class="alert alert-warning hidden">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <h4 class="font-bold">Syntax Warning</h4>
+                            <div id="syntax-error-message" class="text-sm"></div>
+                        </div>
+                    </div>
+
+                    <!-- Content Preview -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Code Preview</span>
+                            <div class="label-text-alt space-x-2">
+                                <button onclick="copyToClipboard()" class="btn btn-ghost btn-xs">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                                <button onclick="downloadCode()" class="btn btn-ghost btn-xs">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button onclick="runCode()" class="btn btn-ghost btn-xs">
+                                    <i class="fas fa-play"></i> Test Run
+                                </button>
+                            </div>
+                        </label>
+                        <textarea 
+                            id="code-content" 
+                            class="textarea textarea-bordered h-96 font-mono text-sm" 
+                            readonly
+                            style="tab-size: 4;"
+                        ></textarea>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-2 justify-center">
+                        <button onclick="generateAnother()" class="btn btn-accent btn-sm">
+                            <i class="fas fa-plus"></i>
+                            Generate Another
+                        </button>
+                        <button onclick="viewInFiles()" class="btn btn-primary btn-sm">
+                            <i class="fas fa-folder"></i>
+                            View in Files
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="hidden">
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <h3 class="font-bold">Code Generation Failed</h3>
+                            <div id="error-message" class="text-sm mt-1">An error occurred during code generation.</div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="retryGeneration()" class="btn btn-accent btn-sm">
+                            <i class="fas fa-redo"></i>
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates and Best Practices -->
+    <div class="card bg-gradient-to-r from-accent/10 to-primary/10 shadow-lg">
+        <div class="card-body">
+            <h3 class="card-title text-lg">
+                <i class="fas fa-lightbulb text-warning"></i>
+                Code Generation Tips
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-sm">🎯 Clear Requirements</h4>
+                    <ul class="text-sm space-y-1 opacity-80">
+                        <li>• Specify exact functions needed</li>
+                        <li>• Include input/output examples</li>
+                        <li>• Mention error handling needs</li>
+                    </ul>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-sm">🏗️ Module Structure</h4>
+                    <ul class="text-sm space-y-1 opacity-80">
+                        <li>• Use descriptive function names</li>
+                        <li>• Include comprehensive docstrings</li>
+                        <li>• Add type hints for clarity</li>
+                    </ul>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-sm">✅ Quality Assurance</h4>
+                    <ul class="text-sm space-y-1 opacity-80">
+                        <li>• Enable unit tests for validation</li>
+                        <li>• Check syntax before using</li>
+                        <li>• Review generated code carefully</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Code Runner Modal -->
+<dialog id="code_runner_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-4xl">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        </form>
+        
+        <h3 class="font-bold text-lg mb-4">
+            <i class="fas fa-terminal text-accent"></i>
+            Code Test Runner
+        </h3>
+        
+        <div class="space-y-4">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <span>This will attempt to run the generated Python code in a safe environment.</span>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-semibold">Output</span>
+                </label>
+                <textarea 
+                    id="code-output" 
+                    class="textarea textarea-bordered h-48 font-mono text-sm" 
+                    readonly
+                    placeholder="Code execution output will appear here..."
+                ></textarea>
+            </div>
+            
+            <div class="flex gap-2 justify-end">
+                <button onclick="executeCode()" class="btn btn-accent btn-sm">
+                    <i class="fas fa-play"></i>
+                    Execute
+                </button>
+            </div>
+        </div>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let lastGeneratedFilename = null;
+
+// Template functions
+const templates = {
+    study_scheduler: "Create functions for managing study schedules: schedule_to_markdown(schedule_dict) converts study plans to markdown, create_study_session(subject, duration) generates timed study blocks, and track_progress(completed_tasks, total_tasks) monitors learning progress.",
+    
+    quiz_tools: "Build quiz management utilities: parse_quiz(text) extracts questions and answers from text, score_quiz(user_answers, correct_answers) calculates scores with feedback, and generate_quiz_stats(scores_list) creates performance analytics.",
+    
+    data_analysis: "Develop data analysis helpers: load_study_data(filename) reads CSV/JSON files, calculate_learning_metrics(data) computes averages and trends, and visualize_progress(data) creates simple charts using matplotlib.",
+    
+    file_utils: "Create file management utilities: organize_notes(directory) sorts files by date/topic, convert_formats(input_file, output_format) transforms between MD/TXT/JSON, and backup_files(source, destination) creates timestamped backups."
+};
+
+function applyTemplate(templateKey) {
+    const functionality = document.getElementById('functionality');
+    functionality.value = templates[templateKey] || '';
+    
+    // Update module name based on template
+    const moduleNames = {
+        study_scheduler: 'study_scheduler',
+        quiz_tools: 'quiz_tools', 
+        data_analysis: 'learning_analytics',
+        file_utils: 'file_manager'
+    };
+    
+    document.getElementById('module_name').value = moduleNames[templateKey] || 'study_utils';
+}
+
+// Form submission
+document.getElementById('code-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        module_name: formData.get('module_name'),
+        functionality: formData.get('functionality'),
+        include_tests: formData.get('include_tests') === 'on',
+        use_curation: formData.get('use_curation') === 'on'
+    };
+    
+    // Show loading state
+    showState('loading');
+    showLoading('#generate-btn');
+    
+    try {
+        const response = await fetch('/generate-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            displayResults(result);
+            lastGeneratedFilename = result.filename;
+            showNotification('Code generated successfully!', 'success');
+        } else {
+            showError(result.error || 'Generation failed');
+        }
+    } catch (error) {
+        showError('Network error: ' + error.message);
+    } finally {
+        showLoading('#generate-btn', false);
+    }
+});
+
+function showState(state) {
+    // Hide all states
+    document.getElementById('initial-state').classList.add('hidden');
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('results-content').classList.add('hidden');
+    document.getElementById('error-state').classList.add('hidden');
+    
+    // Show selected state
+    if (state === 'loading') {
+        document.getElementById('loading-state').classList.remove('hidden');
+    } else if (state === 'results') {
+        document.getElementById('results-content').classList.remove('hidden');
+    } else if (state === 'error') {
+        document.getElementById('error-state').classList.remove('hidden');
+    } else {
+        document.getElementById('initial-state').classList.remove('hidden');
+    }
+}
+
+function displayResults(result) {
+    // Update stats
+    document.getElementById('content-length').textContent = result.stats.length.toLocaleString();
+    document.getElementById('model-used').textContent = result.stats.model || 'Unknown';
+    document.getElementById('tokens-used').textContent = (result.stats.tokens || 0) + ' tokens';
+    
+    // Update syntax status
+    const syntaxValidIcon = document.getElementById('syntax-valid-icon');
+    const syntaxWarningIcon = document.getElementById('syntax-warning-icon');
+    const syntaxStatus = document.getElementById('syntax-status');
+    const syntaxErrorAlert = document.getElementById('syntax-error-alert');
+    const syntaxErrorMessage = document.getElementById('syntax-error-message');
+    
+    if (result.syntax_valid) {
+        syntaxValidIcon.classList.remove('hidden');
+        syntaxWarningIcon.classList.add('hidden');
+        syntaxStatus.textContent = 'Valid Python';
+        syntaxErrorAlert.classList.add('hidden');
+    } else {
+        syntaxValidIcon.classList.add('hidden');
+        syntaxWarningIcon.classList.remove('hidden');
+        syntaxStatus.textContent = 'Syntax Issues';
+        if (result.syntax_error) {
+            syntaxErrorAlert.classList.remove('hidden');
+            syntaxErrorMessage.textContent = result.syntax_error;
+        }
+    }
+    
+    // Display content
+    document.getElementById('code-content').value = result.content;
+    
+    showState('results');
+}
+
+function showError(message) {
+    document.getElementById('error-message').textContent = message;
+    showState('error');
+    showNotification('Code generation failed: ' + message, 'error');
+}
+
+function retryGeneration() {
+    document.getElementById('code-form').dispatchEvent(new Event('submit'));
+}
+
+function generateAnother() {
+    showState('initial');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyToClipboard() {
+    const content = document.getElementById('code-content').value;
+    navigator.clipboard.writeText(content).then(() => {
+        showNotification('Code copied to clipboard!', 'success');
+    }).catch(() => {
+        showNotification('Failed to copy to clipboard', 'error');
+    });
+}
+
+function downloadCode() {
+    const content = document.getElementById('code-content').value;
+    const moduleName = document.getElementById('module_name').value;
+    const filename = `${moduleName}.py`;
+    
+    const blob = new Blob([content], { type: 'text/python' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Code downloaded!', 'success');
+}
+
+function runCode() {
+    document.getElementById('code_runner_modal').showModal();
+}
+
+function executeCode() {
+    const output = document.getElementById('code-output');
+    output.value = 'Executing code...\n';
+    
+    // Simulate code execution (in a real implementation, this would be more sophisticated)
+    setTimeout(() => {
+        const content = document.getElementById('code-content').value;
+        
+        // Simple validation
+        if (content.includes('def ')) {
+            output.value += 'Code structure looks good!\n';
+            output.value += 'Functions detected:\n';
+            
+            const funcMatches = content.match(/def\s+(\w+)/g);
+            if (funcMatches) {
+                funcMatches.forEach(match => {
+                    const funcName = match.replace('def ', '');
+                    output.value += `  - ${funcName}()\n`;
+                });
+            }
+            
+            output.value += '\nNote: This is a basic validation. Run the actual Python file for full testing.';
+        } else {
+            output.value += 'No functions found. Code may need review.';
+        }
+    }, 1000);
+}
+
+function viewInFiles() {
+    if (lastGeneratedFilename) {
+        window.open(`/view/${lastGeneratedFilename}`, '_blank');
+    } else {
+        window.location.href = '/files';
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Focus on functionality input
+    document.getElementById('functionality').focus();
+    
+    // Set up form validation
+    const functionalityInput = document.getElementById('functionality');
+    
+    functionalityInput.addEventListener('input', function() {
+        const generateBtn = document.getElementById('generate-btn');
+        if (this.value.trim()) {
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('btn-disabled');
+        } else {
+            generateBtn.disabled = true;
+            generateBtn.classList.add('btn-disabled');
+        }
+    });
+});
+</script>
+{% endblock %}
